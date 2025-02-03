@@ -61,10 +61,9 @@ export default class Company {
         const data = await readFile(fileName, 'utf-8');
         const parsedEmployees = JSON.parse(data);
 
-        //here I should use the classMap and the prototype to create the employees
         this.#employees = Object.fromEntries(
             Object.entries(parsedEmployees).map(([id, emp]) =>
-                [id, new Employee(emp.id, emp.department, emp.basicSalary)]
+                [id, Employee.createFromObject(emp)]
             )
         );
     }
