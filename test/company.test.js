@@ -7,8 +7,8 @@ import Manager from '../src/entities/manager.js';
 vi.mock('node:fs/promises', () => ({
     writeFile: vi.fn(() => Promise.resolve()),
     readFile: vi.fn(() => Promise.resolve(JSON.stringify({
-        "1": { id: 1, name: "John Doe", salary: 5000 },
-        "2": { id: 2, name: "Alice Smith", salary: 7000 }
+        "1": { id: 1, department: "QA", basicSalary: 5000 },
+        "2": { id: 2, department: "DEV", basicSalary: 7000 }
     })))
 }));
 
@@ -18,9 +18,9 @@ describe('Company Class', () => {
 
     beforeEach(() => {
         company = new Company();
-        emp1 = new Employee(1, "John Doe", 5000);
-        emp2 = new Employee(2, "Alice Smith", 7000);
-        manager = new Manager(3, "Bob Johnson", 9000, 1.5);
+        emp1 = new Employee(1, "QA",  5000);
+        emp2 = new Employee(2, "DEV", 7000);
+        manager = new Manager(3, "DATA", 9000, 1.5);
     });
 
     it('should add an employee', async () => {
@@ -51,14 +51,24 @@ describe('Company Class', () => {
         expect(await company.getDepartmentBudget("IT")).toBe(12000);
     });
 
+    it('should set departments', async() => {
+        const departments = {
+            "IT": [emp1, emp2],
+            "HR": [manager]
+        };
+        company.setDepartments(departments);
+        expect(await company.getDepartments()).toEqual(departments);
+    });
+
     it('should save employees to a file', async () => {
         await company.addEmployee(emp1);
         await company.saveToFile('test.json');
-        expect(writeFile).toHaveBeenCalledWith('test.json', JSON.stringify({ "1": emp1 }));
+        expect(writeFile).toHaveBeenCalledWith('test.json', { "1": emp1 });
     });
 
     it('should restore employees from a file', async () => {
         await company.restoreFromFile('test.json');
-        expect(await company.getEmployee(1)).toEqual({ id: 1, name: "John Doe", salary: 5000 });
+        expect(await company.getEmployee(1)).toEqual({ id: 1, className: "Employee", department: "QA", basicSalary: 5000 });
     });
+
 });

@@ -20,5 +20,4 @@ export default class Employee {
      getDepartment(){
          return this.department
      }
-    
  }

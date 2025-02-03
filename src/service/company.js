@@ -14,6 +14,18 @@ export default class Company {
         if (!(employee instanceof Employee)) {
             throw new Error("Invalid employee object");
         }
+
+        ///validate if the employee already exists 
+        //add department to the department list
+        /*         if (!(await this.getEmployee(employee.id))) {
+                    throw new Error("Employee already exists");
+                }
+        
+                if(!this.#departments[employee.department]) {
+                    this.#departments[employee.department] = employee.department;
+                } */
+
+
         this.#employees[employee.id] = employee;
     }
 
@@ -42,13 +54,19 @@ export default class Company {
     }
 
     async saveToFile(fileName) {
-        await writeFile(fileName, JSON.stringify(this.#employees));
+        await writeFile(fileName, this.#employees);
     }
 
     async restoreFromFile(fileName) {
-        return await readFile(fileName, 'utf-8').then(data => {
-            this.#employees = JSON.parse(data);
-        });
+        const data = await readFile(fileName, 'utf-8');
+        const parsedEmployees = JSON.parse(data);
+
+        //here I should use the classMap and the prototype to create the employees
+        this.#employees = Object.fromEntries(
+            Object.entries(parsedEmployees).map(([id, emp]) =>
+                [id, new Employee(emp.id, emp.department, emp.basicSalary)]
+            )
+        );
     }
 
 }
