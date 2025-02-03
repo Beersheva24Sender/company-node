@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/package",
+  "name": "company",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "vitest": "^3.0.4"
+  }
+}
