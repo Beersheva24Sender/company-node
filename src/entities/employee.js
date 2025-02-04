@@ -1,3 +1,5 @@
+import { EmployeeError } from "../exceptions/employeeError.js";
+
 export default class Employee {
     static classMap = {
         Employee: Employee,
@@ -31,12 +33,12 @@ export default class Employee {
 
     static createFromObject(obj) {
         if (!obj.className) {
-            throw new Error(`Missing className in employee object: ${JSON.stringify(obj)}`);
+            throw new EmployeeError("MISSING_CLASSNAME", `ID: ${id}`)
         }
 
         const EmployeeClass = Employee.classMap[obj.className];
         if (!EmployeeClass) {
-            throw new Error(`Unknown employee type: ${obj.className}`);
+            throw new EmployeeError("UNKNOWN_EMPLOYEE_TYPE", `TYPE: ${obj.className}`);
         }
         return new EmployeeClass(...Object.values(obj));
     }

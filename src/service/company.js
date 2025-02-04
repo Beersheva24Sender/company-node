@@ -1,6 +1,7 @@
 import Employee from '../entities/employee.js';
 import Manager from '../entities/manager.js'
 import { readFile, writeFile } from 'node:fs/promises';
+import EmployeeError from '../exceptions/employeeError.js';
 
 export default class Company {
     #employees
@@ -12,11 +13,11 @@ export default class Company {
 
     async addEmployee(employee) {
         if (!(employee instanceof Employee)) {
-            throw new Error("Invalid employee object");
+            throw new EmployeeError("INVALID_EMPLOYEE");
         }
 
         if ((await this.getEmployee(employee.id))) {
-            throw new Error("Employee already exists");
+            throw new EmployeeError("EMPLOYEE_EXISTS", `ID: ${employee.id}`);
         }
 
         if (!(this.#departments[employee.department])) {

@@ -5,6 +5,7 @@ import Employee from '../src/entities/employee.js';
 import Manager from '../src/entities/manager.js';
 import SalesPerson from '../src/entities/salesPerson.js';
 import WageEmployee from '../src/entities/wageEmployee.js';
+import EmployeeError from '../src/exceptions/employeeError.js';
 
 vi.mock('node:fs/promises', () => ({
     writeFile: vi.fn(() => Promise.resolve()),
@@ -34,7 +35,7 @@ describe('Company Class', () => {
 
     it('should throw an error when adding an existing employee', async () => {
         await company.addEmployee(emp1);
-        await expect(company.addEmployee(emp1)).rejects.toThrow("Employee already exists");
+        await expect(company.addEmployee(emp1)).rejects.toThrow(EmployeeError);
     });
 
     it('should add a new department when adding an employee', async () => {
@@ -45,7 +46,7 @@ describe('Company Class', () => {
     });
 
     it('should throw an error when adding an invalid employee', async () => {
-        await expect(company.addEmployee({ id: 4 })).rejects.toThrow("Invalid employee object");
+        await expect(company.addEmployee({ id: 4 })).rejects.toThrow(EmployeeError);
     });
 
     it('should remove an employee', async () => {
