@@ -15,18 +15,17 @@ export default class Company {
             throw new Error("Invalid employee object");
         }
 
-        ///validate if the employee already exists 
-        //add department to the department list
-        /*         if (!(await this.getEmployee(employee.id))) {
-                    throw new Error("Employee already exists");
-                }
-        
-                if(!this.#departments[employee.department]) {
-                    this.#departments[employee.department] = employee.department;
-                } */
+        if ((await this.getEmployee(employee.id))) {
+            throw new Error("Employee already exists");
+        }
+
+        if (!(this.#departments[employee.department])) {
+            this.#departments[employee.department] = [];
+        }
 
 
         this.#employees[employee.id] = employee;
+        this.#departments[employee.department].push(employee);
     }
 
     async getEmployee(id) {
@@ -34,6 +33,7 @@ export default class Company {
     }
 
     async removeEmployee(id) {
+        delete this.#departments[this.#employees[id].department];
         delete this.#employees[id];
     }
 
@@ -41,12 +41,8 @@ export default class Company {
         return this.#departments[department].reduce((acc, emp) => acc + emp.computeSalary(), 0);
     }
 
-    async setDepartments(departments) {
-        this.#departments = departments;
-    }
-
     async getDepartments() {
-        return this.#departments;
+        return Object.keys(this.#departments).toSorted();
     }
 
     async getManagersWithMostFactor() {

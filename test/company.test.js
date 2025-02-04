@@ -31,6 +31,19 @@ describe('Company Class', () => {
         await company.addEmployee(emp1);
         expect(await company.getEmployee(emp1.id)).toEqual(emp1);
     });
+
+    it('should throw an error when adding an existing employee', async () => {
+        await company.addEmployee(emp1);
+        await expect(company.addEmployee(emp1)).rejects.toThrow("Employee already exists");
+    });
+
+    it('should add a new department when adding an employee', async () => {
+        await company.addEmployee(emp1);
+        await company.addEmployee(emp2);
+        await company.addEmployee(manager);
+        expect(await company.getDepartments()).toEqual(["QA", "DEV", "DATA"].toSorted());
+    });
+
     it('should throw an error when adding an invalid employee', async () => {
         await expect(company.addEmployee({ id: 4 })).rejects.toThrow("Invalid employee object");
     });
@@ -39,6 +52,7 @@ describe('Company Class', () => {
         await company.addEmployee(emp1);
         await company.removeEmployee(emp1.id);
         expect(await company.getEmployee(emp1.id)).toBeUndefined();
+        expect(await company.getDepartments()).toEqual([]);
     });
 
     it('should get managers sorted by factor', async () => {
@@ -49,19 +63,9 @@ describe('Company Class', () => {
     });
 
     it('should calculate department budget', async () => {
-        company.setDepartments({
-            "IT": [emp1, emp2]
-        });
-        expect(await company.getDepartmentBudget("IT")).toBe(12000);
-    });
-
-    it('should set departments', async () => {
-        const departments = {
-            "IT": [emp1, emp2],
-            "HR": [manager]
-        };
-        company.setDepartments(departments);
-        expect(await company.getDepartments()).toEqual(departments);
+        await company.addEmployee(emp1);
+        await company.addEmployee(emp2);
+        expect(await company.getDepartmentBudget("QA")).toBe(5000);
     });
 
     it('should save employees to a file', async () => {
@@ -96,6 +100,8 @@ describe('Company Class', () => {
         expect(emp2).toBeInstanceOf(Manager);
         expect(emp3).toBeInstanceOf(SalesPerson);
         expect(emp4).toBeInstanceOf(WageEmployee);
+
+        expect(emp2.computeSalary()).toEqual(9000 * 1.5);
     });
 
 });
