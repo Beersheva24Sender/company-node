@@ -72,7 +72,7 @@ describe('Company Class', () => {
     it('should save employees to a file', async () => {
         await company.addEmployee(emp1);
         await company.saveToFile('test.json');
-        expect(writeFile).toHaveBeenCalledWith('test.json', { "1": emp1 });
+        expect(writeFile).toHaveBeenCalledWith('test.json',   JSON.stringify([emp1]), 'utf8');
     });
 
     it('should restore employees from a file', async () => {

@@ -4,8 +4,8 @@ import { readFile, writeFile } from 'node:fs/promises';
 import EmployeeError from '../exceptions/employeeError.js';
 
 export default class Company {
-    #employees
-    #departments
+    #employees;
+    #departments;
     constructor() {
         this.#employees = {};
         this.#departments = {};
@@ -34,8 +34,19 @@ export default class Company {
     }
 
     async removeEmployee(id) {
-        delete this.#departments[this.#employees[id].department];
+
+        if (!this.#employees[id]) {
+            throw new EmployeeError("EMPLOYEE_NOT_FOUND", `ID: ${id}`);
+        }
+
+        this.#removeDepartments(this.#employees[id]);
         delete this.#employees[id];
+    }
+    #removeDepartments(employee) {
+        const employees = this.#departments[employee.department];
+        const index = employees.findIndex(e => e.id === employee.id);
+        employees.splice(index, 1);
+        employees.length == 0 && delete this.#departments[employee.department];
     }
 
     async getDepartmentBudget(department) {
@@ -47,11 +58,25 @@ export default class Company {
     }
 
     async getManagersWithMostFactor() {
-        return Object.values(this.#employees).filter(emp => emp instanceof Manager).sort((a, b) => b.getFactor() - a.getFactor());
+        const managers = Object.values(this.#employees).filter(emp => emp instanceof Manager).sort((a, b) => b.getFactor() - a.getFactor());
+        const res = [];
+        let index = 0;
+        if (managers.length > 0) {
+            const maxFactor = managers[0].getFactor();
+            while (
+                index < managers.length &&
+                managers[index].getFactor() == maxFactor
+            ) {
+                res.push(managers[index]);
+                index++;
+            }
+        }
+        return res;
     }
 
     async saveToFile(fileName) {
-        await writeFile(fileName, this.#employees);
+        const employeesJSON = JSON.stringify(Object.values(this.#employees));
+        await writeFile(fileName,employeesJSON,'utf8');
     }
 
     async restoreFromFile(fileName) {
