@@ -6,9 +6,41 @@ import EmployeeError from '../exceptions/employeeError.js';
 export default class Company {
     #employees;
     #departments;
-    constructor() {
+    #predicate;
+    constructor(predicate) {
         this.#employees = {};
         this.#departments = {};
+        this.setPredicate(predicate);
+        this.#setIterable();
+    }
+
+    #setIterable() {
+        this[Symbol.asyncIterator] = async function* () {
+            const values = Object.values(this.#employees);
+            let indexCur = -1;
+
+            while (true) {
+                const { index, value } = this.#getNext(indexCur, values);
+                if (!value) {
+                    break;
+                }
+                yield value;
+                indexCur = index;
+            }
+        }
+    }
+
+    #getNext(index, values) {
+        let value;
+        index++;
+        while ((value = values[index]) && !this.#predicate(value)) {
+            index++;
+        }
+        return { index, value };
+    }
+    
+    setPredicate(predicate) {
+        this.#predicate = predicate ?? (e => true);
     }
 
     async addEmployee(employee) {
@@ -76,7 +108,7 @@ export default class Company {
 
     async saveToFile(fileName) {
         const employeesJSON = JSON.stringify(Object.values(this.#employees));
-        await writeFile(fileName,employeesJSON,'utf8');
+        await writeFile(fileName, employeesJSON, 'utf8');
     }
 
     async restoreFromFile(fileName) {
